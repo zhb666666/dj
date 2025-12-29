@@ -1,1 +1,0 @@
-import{r as e}from"./index.0b479091.js";function u(){return e.get({url:"/user/all"})}function s(r){return e.get({url:"/user/list",params:r})}function n(r){return e.get({url:"/user/detail",params:r})}function i(r){return e.post({url:"/user/edit",params:r})}export{i as a,s as b,n as g,u};

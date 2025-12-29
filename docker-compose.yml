@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  like-front:
+    image: registry.cn-hangzhou.aliyuncs.com/zhbpublic/like-front:v0.0.1
+    ports:
+      - "8088:8088"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - /home/uploads:/home/uploads
+    networks:
+      - app-network
+
+  like-admin:
+    image: registry.cn-hangzhou.aliyuncs.com/zhbpublic/like-admin:v0.0.1
+    ports:
+      - "8086:8086"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - /home/uploads:/home/uploads
+    networks:
+      - app-network
+
+  like-pc:
+    image: registry.cn-hangzhou.aliyuncs.com/zhbpublic/like-pc:v0.0.1
+    ports:
+      - "8889:8889"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      - app-network
+
+  like-pc-admin:
+    image: registry.cn-hangzhou.aliyuncs.com/zhbpublic/like-pc-admin:v0.0.1
+    ports:
+      - "8888:8888"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

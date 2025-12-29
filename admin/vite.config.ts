@@ -13,7 +13,22 @@ import vueSetupExtend from 'vite-plugin-vue-setup-extend'
 export default defineConfig({
     // base: '/admin/',
     server: {
-        host: '0.0.0.0'
+        host: '0.0.0.0',
+        port: 8889,
+/*        proxy: {
+            // 代理所有 /api 请求到后端
+            '/api': {
+                target: 'http://like-admin:8086', // 后端地址
+                changeOrigin: true, // 允许跨域
+                rewrite: (path) => path, // 保持路径不变
+                // 可选：设置请求头
+                headers: {
+                    // 如果你需要传递原始Host信息
+                    // 'X-Forwarded-Host': 'localhost:6688'
+                }
+            }
+        }*/
+
     },
     plugins: [
         vue(),

@@ -1,7 +1,7 @@
 # 项目配置
 like:
   # 上传目录
-  upload-directory: /www/uploads/likeadmin-java/
+  upload-directory: /home/uploads/ # 上传目录
   # Swagger配置
   swagger:
     # 是否开启swagger
@@ -18,7 +18,7 @@ server:
 # 框架配置
 spring:
   profiles:
-    active: dev
+    active: prod
   mvc:
     static-path-pattern: /api/static/**
     throw-exception-if-no-handler-found: true
@@ -26,11 +26,11 @@ spring:
       matching-strategy: ant_path_matcher
   # 数据源配置
   datasource:
-    url: jdbc:mysql://localhost:3306/local_likeadmin?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    url: jdbc:mysql://47.99.138.193:3306/party_java?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     type: com.zaxxer.hikari.HikariDataSource # 数据源类型
     driver-class-name: com.mysql.jdbc.Driver # MySql的驱动
     username: root # 数据库账号
-    password: root # 数据库密码
+    password: xuhao520.. # 数据库密码
     hikari:
       connection-timeout: 30000     # 等待连接分配连接的最大时长(毫秒),超出时长还没可用连接则发送SQLException,默认30秒
       minimum-idle: 5               # 最小连接数
@@ -48,10 +48,10 @@ spring:
       enabled: true
   # Redis配置
   redis:
-    host: localhost   # Redis服务地址
+    host: 47.99.138.193   # Redis服务地址
     port: 6379        # Redis端口
-    password:         # Redis密码
-    database: 0       # 数据库索引
+    password: kkx88        # Redis密码
+    database: 1       # 数据库索引
     timeout: 5000     # 连接超时
     lettuce:
       pool:
