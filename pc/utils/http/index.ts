@@ -25,27 +25,52 @@ export function createRequest(opt?: Partial<FetchOptions>) {
         async onRequest({ options }) {
             const { withToken } = options.requestOptions
             const headers = options.headers || {}
+            
+            // 确保设置Content-Type
+            if (!headers['Content-Type'] && !options.body) {
+                headers['Content-Type'] = 'application/json'
+            }
+            
             // 添加token
             if (withToken) {
                 const token = userStore.token
-                headers['like-token'] = token
+                console.log('添加token:', token ? 'Bearer ' + token : '无token')
+                if (token) {
+                    headers['like-token'] = token
+                }
             }
+            
+            // 添加终端和版本信息
             options.headers['terminal'] = getClient()
+            options.headers['version'] = getVersion()
+            
+            // 输出请求信息用于调试
+            console.log('请求配置:', {
+                url: options.url,
+                method: options.method,
+                headers: options.headers,
+                withToken: withToken
+            })
+            
             options.headers = headers
         },
         requestOptions: {
             apiPrefix: getApiPrefix(),
             isTransformResponse: true,
             isReturnDefaultResponse: false,
-            withToken: true,
+            withToken: true, // 默认所有请求都需要token
             isParamsToData: true,
+            forceToken: true, // 新增：强制token验证
             requestInterceptorsHook(options) {
-                console.log(options)
-                const { apiPrefix, isParamsToData } = options.requestOptions
+                console.log('请求拦截器:', options)
+                
+                const { apiPrefix, isParamsToData, forceToken } = options.requestOptions
+                
                 // 拼接请求前缀
                 if (apiPrefix) {
                     options.url = `${apiPrefix}${options.url}`
                 }
+                
                 const params = options.params || {}
                 // POST请求下如果无data，则将params视为data
                 if (
@@ -56,6 +81,13 @@ export function createRequest(opt?: Partial<FetchOptions>) {
                     options.body = params
                     options.params = {}
                 }
+                
+                // 强制验证token
+                if (forceToken && !userStore.token) {
+                    console.error('❌ 缺少必需的token！')
+                    throw new Error('请先登录')
+                }
+                
                 return options
             },
             async responseInterceptorsHook(response, options) {
