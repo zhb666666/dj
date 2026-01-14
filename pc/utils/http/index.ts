@@ -28,9 +28,12 @@ export function createRequest(opt?: Partial<FetchOptions>) {
             // 添加token
             if (withToken) {
                 const token = userStore.token
-                headers['like-token'] = token
+                if (token) {
+                    // Sa-Token token-name: open_party_java
+                    headers['open_party_java'] = token
+                }
             }
-            options.headers['terminal'] = getClient()
+            headers['terminal'] = getClient()
             options.headers = headers
         },
         requestOptions: {
@@ -40,7 +43,6 @@ export function createRequest(opt?: Partial<FetchOptions>) {
             withToken: true,
             isParamsToData: true,
             requestInterceptorsHook(options) {
-                console.log(options)
                 const { apiPrefix, isParamsToData } = options.requestOptions
                 // 拼接请求前缀
                 if (apiPrefix) {
@@ -93,7 +95,7 @@ export function createRequest(opt?: Partial<FetchOptions>) {
                         userStore.logout()
                         setPopupType(PopupTypeEnum.LOGIN)
                         toggleShowPopup(true)
-                        return Promise.reject()
+                        return Promise.reject(msg || '登录已过期，请重新登录')
 
                     default:
                         return data

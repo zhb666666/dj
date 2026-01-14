@@ -97,15 +97,19 @@ const sendSms = async () => {
 }
 
 const handleConfirm = async () => {
-    await formRef.value?.validate()
-    if (userStore.isLogin) {
-        await userBindMobile(formData)
-    } else {
-        await userBindMobile(formData, { token: userStore.temToken })
-        userStore.login(userStore.temToken)
-        await userStore.getUser()
+    try {
+        await formRef.value?.validate()
+        if (userStore.isLogin) {
+            await userBindMobile(formData)
+        } else {
+            await userBindMobile(formData, { token: userStore.temToken })
+            userStore.login(userStore.temToken)
+            await userStore.getUser()
+        }
+        toggleShowPopup(false)
+    } catch (error) {
+        return
     }
-    toggleShowPopup(false)
 }
 const { lockFn: handleConfirmLock, isLock } = useLockFn(handleConfirm)
 </script>
