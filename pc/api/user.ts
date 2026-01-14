@@ -14,9 +14,14 @@ export function userEdit(params: any) {
 
 // 绑定手机
 export function userBindMobile(params: any, headers?: any) {
+    const requestHeaders = { ...headers }
+    if (requestHeaders?.token && !requestHeaders?.open_party_java) {
+        requestHeaders.open_party_java = requestHeaders.token
+        delete requestHeaders.token
+    }
     return $request.post(
-        { url: '/user/bindMobile', params, headers },
-        { withToken: !headers?.token }
+        { url: '/user/bindMobile', params, headers: requestHeaders },
+        { withToken: !requestHeaders?.open_party_java }
     )
 }
 

@@ -265,35 +265,38 @@ const sendSms = async () => {
 }
 
 const handleLogin = async () => {
-    await formRef.value?.validate()
-    const params: any = {}
-    if (isAccountLogin.value) {
-        params.username = formData.account
-        params.password = formData.password
-    }
-    if (isMobileLogin.value) {
-        params.mobile = formData.account
-        params.code = formData.code
-    }
-    let data
-    switch (formData.scene) {
-        case LoginWayEnum.ACCOUNT:
-            data = await accountLogin(params)
-            break
-        case LoginWayEnum.MOBILE:
-            data = await mobileLogin(params)
-
-            break
-    }
-    if (!data) return
-    if (isForceBindMobile.value && !data.isBindMobile) {
-        userStore.temToken = data.token
-        setPopupType(PopupTypeEnum.BIND_MOBILE)
+    try {
+        await formRef.value?.validate()
+        const params: any = {}
+        if (isAccountLogin.value) {
+            params.username = formData.account
+            params.password = formData.password
+        }
+        if (isMobileLogin.value) {
+            params.mobile = formData.account
+            params.code = formData.code
+        }
+        let data
+        switch (formData.scene) {
+            case LoginWayEnum.ACCOUNT:
+                data = await accountLogin(params)
+                break
+            case LoginWayEnum.MOBILE:
+                data = await mobileLogin(params)
+                break
+        }
+        if (!data) return
+        if (isForceBindMobile.value && !data.isBindMobile) {
+            userStore.temToken = data.token
+            setPopupType(PopupTypeEnum.BIND_MOBILE)
+            return
+        }
+        userStore.login(data.token)
+        await userStore.getUser()
+        toggleShowPopup(false)
+    } catch (error) {
         return
     }
-    userStore.login(data.token)
-    await userStore.getUser()
-    toggleShowPopup(false)
 }
 const { lockFn: handleLoginLock, isLock } = useLockFn(handleLogin)
 const agreementConfirm = async () => {
