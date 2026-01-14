@@ -101,7 +101,18 @@ export function createRequest(opt?: Partial<FetchOptions>) {
                 if (!isTransformResponse) {
                     return response._data
                 }
+                
+                // 检查响应状态
+                if (!response.ok) {
+                    console.error('❌ HTTP错误:', response.status, response.statusText)
+                    throw new Error(`请求失败: ${response.status} ${response.statusText}`)
+                }
+                
                 const { code, data, msg } = response._data
+                
+                // 记录响应信息用于调试
+                console.log('📡 响应信息:', { code, msg, data })
+                
                 switch (code) {
                     case RequestCodeEnum.SUCCESS:
                         return data
@@ -118,20 +129,56 @@ export function createRequest(opt?: Partial<FetchOptions>) {
                         if (msg) {
                             msg && feedback.msgError(msg)
                         }
-                        return Promise.reject(msg)
+                        return Promise.reject(new Error(msg || '请求失败'))
 
                     case RequestCodeEnum.TOKEN_INVALID:
                     case RequestCodeEnum.TOKEN_EMPTY:
+                        console.log('🔑 Token无效，需要重新登录')
                         userStore.logout()
                         setPopupType(PopupTypeEnum.LOGIN)
                         toggleShowPopup(true)
-                        return Promise.reject()
+                        return Promise.reject(new Error('请重新登录'))
 
                     default:
                         return data
                 }
             },
             responseInterceptorsCatchHook(err) {
+                console.error('❌ 请求捕获到错误:', err)
+                
+                // 获取当前请求配置
+                const config = useRuntimeConfig().public
+                const userStore = useUserStore()
+                
+                // 处理不同类型的错误
+                if (err.name === 'TypeError' && err.message.includes('fetch')) {
+                    console.error('❌ 网络连接失败:', err.message)
+                    console.log('请检查:')
+                    console.log('1. 后端服务是否启动')
+                    console.log('2. API地址是否正确:', config.apiUrl)
+                    console.log('3. 网络连接是否正常')
+                    
+                    // 显示网络诊断信息
+                    console.log('🔍 当前配置:', {
+                        apiUrl: config.apiUrl,
+                        baseURL: config.apiUrl,
+                        tokenExists: !!userStore.token,
+                        currentUrl: window.location.href
+                    })
+                    
+                    feedback.msgError('网络连接失败，请检查后端服务是否正常启动')
+                    return new Error('网络连接失败，请稍后重试')
+                }
+                
+                if (err.response) {
+                    console.error('❌ HTTP响应错误:', err.response.status, err.response.statusText)
+                    feedback.msgError(`请求失败: ${err.response.status} ${err.response.statusText}`)
+                    return err
+                }
+                
+                // 默认错误处理
+                console.error('❌ 未知错误:', err)
+                feedback.msgError('请求失败，请稍后重试')
                 return err
             }
         }
